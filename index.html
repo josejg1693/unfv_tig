@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css" />
+        <link rel="stylesheet" type="text/css" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet-heat.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/OSMBuildings-Leaflet.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/leaflet-tilelayer-wmts.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="data/TemporaryLayervolatile0.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.addAttribution('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a>');
+        var bounds_group = new L.featureGroup([]);
+        var basemap0 = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            maxZoom: 28
+        });
+        basemap0.addTo(map);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        function geoJson2heat(geojson, weight) {
+          return geojson.features.map(function(feature) {
+            return [
+              feature.geometry.coordinates[1],
+              feature.geometry.coordinates[0],
+              feature.properties[weight]
+            ];
+          });
+        }
+        function pop_TemporaryLayervolatile0(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    layer.setStyle(style_TemporaryLayervolatile0(feature));
+
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Codigo'] !== null ? Autolinker.link(String(feature.properties['Codigo'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Constancia'] !== null ? Autolinker.link(String(feature.properties['Constancia'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Instalacion Existente'] !== null ? Autolinker.link(String(feature.properties['Instalacion Existente'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Instalacion Robada'] !== null ? Autolinker.link(String(feature.properties['Instalacion Robada'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Instalacion Trasladada'] !== null ? Autolinker.link(String(feature.properties['Instalacion Trasladada'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Fecha'] !== null ? Autolinker.link(String(feature.properties['Fecha'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nombre'] !== null ? Autolinker.link(String(feature.properties['Nombre'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Apellido'] !== null ? Autolinker.link(String(feature.properties['Apellido'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Dni'] !== null ? Autolinker.link(String(feature.properties['Dni'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Departamento'] !== null ? Autolinker.link(String(feature.properties['Departamento'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Provincia'] !== null ? Autolinker.link(String(feature.properties['Provincia'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Distrito'] !== null ? Autolinker.link(String(feature.properties['Distrito'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Centro Poblado'] !== null ? Autolinker.link(String(feature.properties['Centro Poblado'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Latitud'] !== null ? Autolinker.link(String(feature.properties['Latitud'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Longitud'] !== null ? Autolinker.link(String(feature.properties['Longitud'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Distribuidora'] !== null ? Autolinker.link(String(feature.properties['Distribuidora'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Contratista'] !== null ? Autolinker.link(String(feature.properties['Contratista'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Técnico'] !== null ? Autolinker.link(String(feature.properties['Técnico'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Observaciòn'] !== null ? Autolinker.link(String(feature.properties['Observaciòn'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Modulo Fotovoltaico 1 RER 1'] !== null ? Autolinker.link(String(feature.properties['Modulo Fotovoltaico 1 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Modulo Fotovoltaico 1 RER 2'] !== null ? Autolinker.link(String(feature.properties['Modulo Fotovoltaico 1 RER 2'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Modulo Fotovoltaico 2 RER 2'] !== null ? Autolinker.link(String(feature.properties['Modulo Fotovoltaico 2 RER 2'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Modulo Fotovoltaico 1 RER 3'] !== null ? Autolinker.link(String(feature.properties['Modulo Fotovoltaico 1 RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Modulo Fotovoltaico 2 RER 3'] !== null ? Autolinker.link(String(feature.properties['Modulo Fotovoltaico 2 RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Modulo Fotovoltaico 4 RER 3'] !== null ? Autolinker.link(String(feature.properties['Modulo Fotovoltaico 4 RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DC Energy Box RER 1'] !== null ? Autolinker.link(String(feature.properties['DC Energy Box RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Estacion Energia RER 2 y  RER 3'] !== null ? Autolinker.link(String(feature.properties['Estacion Energia RER 2 y  RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lampara 1 RER 1'] !== null ? Autolinker.link(String(feature.properties['Lampara 1 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lampara 2 RER 1'] !== null ? Autolinker.link(String(feature.properties['Lampara 2 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lampara 3 RER 1'] !== null ? Autolinker.link(String(feature.properties['Lampara 3 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Termomagnetico Lamparas RER 1'] !== null ? Autolinker.link(String(feature.properties['Interruptor Termomagnetico Lamparas RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Termomagnetico Tomacorriente RER 1'] !== null ? Autolinker.link(String(feature.properties['Interruptor Termomagnetico Tomacorriente RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Termomagnetico Lamparas RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Interruptor Termomagnetico Lamparas RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Termomagnetico Tomacorriente RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Interruptor Termomagnetico Tomacorriente RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Diferencial RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Interruptor Diferencial RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Material Poste Metalico Fierro Galvanizado RER 1 RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Material Poste Metalico Fierro Galvanizado RER 1 RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Cimentacion Poste'] !== null ? Autolinker.link(String(feature.properties['Cimentacion Poste'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Caseta Fuerza RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Caseta Fuerza RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Instalacion RER TIPO 1 Instalada EN VIVIENDA'] !== null ? Autolinker.link(String(feature.properties['Instalacion RER TIPO 1 Instalada EN VIVIENDA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Instalacion RERTIPO 2 Instalada EN ESTABLECIMIENTO DE SALUD'] !== null ? Autolinker.link(String(feature.properties['Instalacion RERTIPO 2 Instalada EN ESTABLECIMIENTO DE SALUD'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Instalacion RERTIPO 3 Instalada EN INSTITUCION EDUCATIVA'] !== null ? Autolinker.link(String(feature.properties['Instalacion RERTIPO 3 Instalada EN INSTITUCION EDUCATIVA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Generador Fotovoltaico RER 1 Formado Por Un Modulo Fotovoltaico'] !== null ? Autolinker.link(String(feature.properties['Generador Fotovoltaico RER 1 Formado Por Un Modulo Fotovoltaico'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Generador Fotovoltaico RER 2 Formado Por Dos Modulos Fotovoltaicos'] !== null ? Autolinker.link(String(feature.properties['Generador Fotovoltaico RER 2 Formado Por Dos Modulos Fotovoltaicos'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Generador Fotovoltaico RER 3 Formado Por Cuatro Modulos Fotovolaticos'] !== null ? Autolinker.link(String(feature.properties['Generador Fotovoltaico RER 3 Formado Por Cuatro Modulos Fotovolaticos'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Generador Fotovoltaico Libre Sombras RER 1 RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Generador Fotovoltaico Libre Sombras RER 1 RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Orientacion Generador Fotovoltaico Norte RER 1 RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Orientacion Generador Fotovoltaico Norte RER 1 RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DC Energy Box Caja Alimentación Inoperativo 1'] !== null ? Autolinker.link(String(feature.properties['DC Energy Box Caja Alimentación Inoperativo 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DC Energy Box Caja Alimentación Inoperativo 2'] !== null ? Autolinker.link(String(feature.properties['DC Energy Box Caja Alimentación Inoperativo 2'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lampara 1 RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Lampara 1 RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lampara 2 RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Lampara 2 RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lampara 3 RER 2 y RER 3'] !== null ? Autolinker.link(String(feature.properties['Lampara 3 RER 2 y RER 3'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Simple 1 RER 1'] !== null ? Autolinker.link(String(feature.properties['Interruptor Simple 1 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Simple 2 RER 1'] !== null ? Autolinker.link(String(feature.properties['Interruptor Simple 2 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Interruptor Simple 3 RER 1'] !== null ? Autolinker.link(String(feature.properties['Interruptor Simple 3 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tomacorriente Doble 1 RER 1'] !== null ? Autolinker.link(String(feature.properties['Tomacorriente Doble 1 RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Cargador Universal Para Telefono Movil RER 1'] !== null ? Autolinker.link(String(feature.properties['Cargador Universal Para Telefono Movil RER 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tuberias PVC Bien Instaladas'] !== null ? Autolinker.link(String(feature.properties['Tuberias PVC Bien Instaladas'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Modulo Fotovoltaico Firmemente Posicionado Sin Riesgo Caida'] !== null ? Autolinker.link(String(feature.properties['Modulo Fotovoltaico Firmemente Posicionado Sin Riesgo Caida'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Cableado Interior Instalado Unicamente RER Tipo 1'] !== null ? Autolinker.link(String(feature.properties['Cableado Interior Instalado Unicamente RER Tipo 1'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Existen Cables Empalmados Presenta Riesgo Corto Circuito'] !== null ? Autolinker.link(String(feature.properties['Existen Cables Empalmados Presenta Riesgo Corto Circuito'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function style_TemporaryLayervolatile0(feature) {
+            switch(feature.properties['Modulo Fotovoltaico 1 RER 1']) {
+                case '-':
+                    return {
+                pane: 'pane_TemporaryLayervolatile0',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,127,0,1.0)',
+            }
+                    break;
+                case 'Correcto':
+                    return {
+                pane: 'pane_TemporaryLayervolatile0',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,1.0)',
+            }
+                    break;
+                case 'Incorrecto':
+                    return {
+                pane: 'pane_TemporaryLayervolatile0',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_TemporaryLayervolatile0',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,63,112,1.0)',
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_TemporaryLayervolatile0');
+        map.getPane('pane_TemporaryLayervolatile0').style.zIndex = 400;
+        map.getPane('pane_TemporaryLayervolatile0').style['mix-blend-mode'] = 'normal';
+        var layer_TemporaryLayervolatile0 = new L.geoJson(json_TemporaryLayervolatile0, {
+            attribution: '<a href=""></a>',
+            pane: 'pane_TemporaryLayervolatile0',
+            onEachFeature: pop_TemporaryLayervolatile0,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_TemporaryLayervolatile0(feature)).bindTooltip((feature.properties['Codigo'] !== null?String('<div style="color: #000000; font-size: 8pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + feature.properties['Codigo']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_TemporaryLayervolatile0'}).openTooltip();
+            }
+        });
+        var cluster_TemporaryLayervolatile0 = new L.MarkerClusterGroup({showCoverageOnHover: false});
+        cluster_TemporaryLayervolatile0.addLayer(layer_TemporaryLayervolatile0);
+
+        bounds_group.addLayer(layer_TemporaryLayervolatile0);
+        cluster_TemporaryLayervolatile0.addTo(map);
+        setBounds();
+            if (map.hasLayer(layer_TemporaryLayervolatile0)) {
+                if (map.getZoom() <= 19 && map.getZoom() >= 12) {
+                    layer_TemporaryLayervolatile0.eachLayer(function (layer) {
+                        layer.openTooltip();
+                    });
+                } else {
+                    layer_TemporaryLayervolatile0.eachLayer(function (layer) {
+                        layer.closeTooltip();
+                    });
+                }
+            }
+        </script>
+    </body>
+</html>
